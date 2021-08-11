@@ -18,7 +18,6 @@ function ModelViewer() {
     var camera, renderer, controls, stats;
     const raycaster = new THREE.Raycaster();
 
-    //const mouse = new THREE.Vector2();
     const mouse = useRef(new THREE.Vector2());
     var intersects = useRef([]);
     var selectable = useRef([]);
