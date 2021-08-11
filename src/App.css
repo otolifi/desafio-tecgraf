@@ -64,7 +64,6 @@ html, body, #root {
   border: 1px solid #282c34;
   border-radius: 8px;
   z-index: 1000;
-  opacity: 0.9;
 }
 
 .options {

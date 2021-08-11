@@ -78,9 +78,6 @@ function ModelViewer() {
     })
     .then(function (response) {
         // handle success
-
-        console.log(response.data)
-
         models = response.data.models;
         colors = response.data.colors;
 
@@ -142,11 +139,26 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
         scene.current = new THREE.Scene();
         scene.current.background = new THREE.Color(0xffffff);
 
+        /*
+        var skyTexture = new THREE.TextureLoader().load('img/pexels-freestocksorg-412462.jpg');
+        var sky = new THREE.MeshPhongMaterial({map: skyTexture, side: THREE.BackSide});
+        let skyGeo = new THREE.SphereGeometry(950000, 100, 100);
+        let skyBox = new THREE.Mesh(skyGeo, sky);
+        skyBox.position.set(0, 0, 0);
+        scene.current.add(skyBox);
+        */
+
+        var planeGeo = new THREE.PlaneGeometry( 500000, 500000 );
+        var planeMAt = new THREE.MeshBasicMaterial( {color: 0xf0f0f0, side: THREE.DoubleSide} );
+        var plane = new THREE.Mesh( planeGeo, planeMAt );
+        plane.rotation.x = Math.PI / 2;
+        //scene.current.add( plane );
+
         let light = new THREE.AmbientLight({color: 0xffffff, intensity: 1});
         scene.current.add(light);
 
         camera = new THREE.PerspectiveCamera(45, mountRef.current.clientWidth/mountRef.current.clientHeight, 0.1, 1000000);
-        renderer = new THREE.WebGLRenderer({antialias: false});
+        renderer = new THREE.WebGLRenderer({antialias: true});
         renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
         mountRef.current.appendChild( renderer.domElement );
 
@@ -191,6 +203,7 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
         window.addEventListener( 'resize', onWindowResize, false );
 
         controls = new OrbitControls(camera, renderer.domElement);
+        controls.maxPolarAngle = Math.PI/2 - 0.1;
         controls.update();
 
         stats = Stats()
@@ -258,8 +271,6 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
         let count = [0, 0, 0, 0];
         if (selected.current.length > 0) {
             for (var x in selected.current) {
-                console.log(x);
-                console.log(selected.current[x].userData['group_letter'])
                 switch (selected.current[x].userData['group_letter']) {
                     case "Grupo A":
                         count[0]++;
@@ -286,7 +297,6 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
             {name: "Grupo D", value: count[3]},
         ];
         setGroup(grp_data);
-        console.log(group);
     }
 
     function handleClick() {
