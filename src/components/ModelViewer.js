@@ -295,13 +295,13 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
             var color = "0x"+Math.floor(Math.random()*16777215).toString(16);
             color = colors[x];
 
-            loadGeometries(models[x], color, i, numberOfModels, j);
+            //loadGeometries(models[x], color, i, numberOfModels, j);
 
-            /*
+            
             for (var y in models[x]) {
                 loadGeometry(models[x][y], color, i, numberOfModels, j);
                 j++;
-            }*/
+            }
             i++;
         }
         camera.position.z = 200000;
