@@ -106,6 +106,7 @@ function ModelViewer() {
    }
 
    function loadGeometries(paths, color, group, numberOfModels, modelIndex) {
+    setProgress(100);
     let mergeGeo = new THREE.BufferGeometry();
 
     let promisePaths = [];
@@ -135,7 +136,7 @@ function ModelViewer() {
             }
             mesh.userData['group_letter'] = 'Grupo ' + groupLetter;
 
-            setProgress(100);
+            //setProgress(100);
 
             selectable.current.push(mesh);
         })
@@ -294,13 +295,13 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
             var color = "0x"+Math.floor(Math.random()*16777215).toString(16);
             color = colors[x];
 
-            //loadGeometries(models[x], color, i, numberOfModels, j);
+            loadGeometries(models[x], color, i, numberOfModels, j);
 
-            
+            /*
             for (var y in models[x]) {
                 loadGeometry(models[x][y], color, i, numberOfModels, j);
                 j++;
-            }
+            }*/
             i++;
         }
         camera.position.z = 200000;
