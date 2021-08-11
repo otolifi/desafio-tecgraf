@@ -404,6 +404,7 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
 
     useEffect(() => {
         getAll();
+        document.title = "Desafio - Otoniel de Lima Filho";
     }, []
     )
 
