@@ -8,6 +8,7 @@ import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import http from '../http-common';
 import Stats from 'three/examples/jsm/libs/stats.module'
 import Draggable from 'react-draggable';
+import {BufferGeometryUtils} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 import { BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
 
@@ -94,6 +95,107 @@ function ModelViewer() {
       });
   };
 
+  function loadPLY(path) {
+    const loader = new PLYLoader();
+    return new Promise(resolve => {
+      loader.load(path, result => {
+         console.log('Success');
+          resolve(result);
+      });
+   });
+   }
+
+   function loadGeometries(paths, color, group, numberOfModels, modelIndex) {
+    let mergeGeo = new THREE.BufferGeometry();
+
+    let promisePaths = [];
+    paths.forEach(path => {
+        promisePaths.push(loadPLY(path));
+    });
+
+    Promise.all(promisePaths)
+        .then(geometries => {
+            geometries.forEach(geometry => geometry.computeVertexNormals());
+            mergeGeo = BufferGeometryUtils.mergeBufferGeometries(geometries);
+            let mat = new THREE.MeshStandardMaterial();
+            mat.color.setHex( color );
+
+            let mesh = new THREE.Mesh(mergeGeo, mat);
+            scene.current.add(mesh);
+            mesh.userData['grupo'] = 'Grupo ' + group;
+            let groupLetter = 'A';
+            if (group < 5) {
+                groupLetter = 'A';
+            } else if (group > 4 && group < 10) {
+                groupLetter = 'B';
+            } else if (group > 9 && group < 16) {
+                groupLetter = 'C';
+            } else {
+                groupLetter = 'D';
+            }
+            mesh.userData['group_letter'] = 'Grupo ' + groupLetter;
+
+            setProgress(100);
+
+            selectable.current.push(mesh);
+        })
+        .then(() => {
+           
+           animate();
+        })
+        .catch(err => {console.error(err);});
+}
+
+  function loadGeometries2(paths, color, group, numberOfModels, modelIndex) {
+    let mergeGeo = new THREE.BufferGeometry();
+
+    const loader = new PLYLoader();
+    paths.forEach(path => {
+        loader.load(
+            path,
+            function (geometry) {
+                geometry.computeVertexNormals()
+                if (geometry) {
+                    //let partMesh = new THREE.Mesh(geometry, mat);
+                    //partMesh.updateMatrix();
+                    mergeGeo.merge(geometry);
+                }
+            },
+            (xhr) => {
+                //console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+            },
+            (error) => {
+                console.log(error)
+            }
+        )
+    });
+
+    //console.log(geometries);
+    //var mergeGeo = BufferGeometryUtils.mergeBufferGeometries(geometries, false);
+    const mat = new THREE.MeshPhongMaterial();
+    mat.color.setHex( color );
+    const mesh = new THREE.Mesh(mergeGeo, mat);
+    scene.current.add(mesh);
+    mesh.userData['grupo'] = 'Grupo ' + group;
+    let groupLetter = 'A';
+    if (group < 5) {
+        groupLetter = 'A';
+    } else if (group > 4 && group < 10) {
+        groupLetter = 'B';
+    } else if (group > 9 && group < 16) {
+        groupLetter = 'C';
+    } else {
+        groupLetter = 'D';
+    }
+    mesh.userData['group_letter'] = 'Grupo ' + groupLetter;
+
+    setProgress(Math.ceil(100 * (modelIndex / numberOfModels)));
+
+    selectable.current.push(mesh);
+
+    
+}
+
 function loadGeometry(path, color, group, numberOfModels, modelIndex) {
     const loader = new PLYLoader();
     loader.load(
@@ -157,7 +259,7 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
         let light = new THREE.AmbientLight({color: 0xffffff, intensity: 1});
         scene.current.add(light);
 
-        camera = new THREE.PerspectiveCamera(45, mountRef.current.clientWidth/mountRef.current.clientHeight, 0.1, 1000000);
+        camera = new THREE.PerspectiveCamera(60, mountRef.current.clientWidth/mountRef.current.clientHeight, 0.1, 300000);
         renderer = new THREE.WebGLRenderer({antialias: true});
         renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
         mountRef.current.appendChild( renderer.domElement );
@@ -191,13 +293,17 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
         for (var x in models) {
             var color = "0x"+Math.floor(Math.random()*16777215).toString(16);
             color = colors[x];
+
+            //loadGeometries(models[x], color, i, numberOfModels, j);
+
+            
             for (var y in models[x]) {
                 loadGeometry(models[x][y], color, i, numberOfModels, j);
                 j++;
             }
             i++;
         }
-        camera.position.z = 500000;
+        camera.position.z = 200000;
         camera.position.y = 150000;
 
         window.addEventListener( 'resize', onWindowResize, false );
@@ -208,6 +314,8 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
 
         stats = Stats()
         document.body.appendChild(stats.dom)
+
+        console.log(scene.current.children);
 
         animate();
         }
@@ -241,8 +349,8 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
     
         stats.update()
         renderer.render(scene.current, camera);
-        //renderer.setAnimationLoop(animate);
-        requestAnimationFrame(animate);
+        renderer.setAnimationLoop(animate);
+        //requestAnimationFrame(animate);
     }
 
 
@@ -309,6 +417,7 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
         }
 
         calculateGraphs();
+        console.log(scene.current.children);
     }
 
     useEffect(() => {
