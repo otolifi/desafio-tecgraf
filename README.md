@@ -2,7 +2,11 @@
 
 Este projeto possui API em Flask (Python) e Front-End React.JS
 
-Primeiro, instale as dependências Python para habilitar o Flask em localhost - No terminal, vá para a pasta 'api' e digite o comando:
+Clone o repositório, vá para a pasta 'desafio-tecgraf' e dê o comando no terminal:
+
+### `npm install`
+
+Agora, vá para a pasta 'api' e digite o comando e instale as dependências Python para habilitar o Flask em localhost:
 
 ### `pip install -r requirements.txt`
 
