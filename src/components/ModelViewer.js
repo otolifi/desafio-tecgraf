@@ -26,7 +26,8 @@ function ModelViewer() {
 
     var newModelState = [];
     var models = [];
-    var colors = [];
+    var colors = useRef([]);
+    const scale = 0.001;
 
     const [group, setGroup] = useState([
         { name: "Grupo A", value: 4},
@@ -80,7 +81,7 @@ function ModelViewer() {
     .then(function (response) {
         // handle success
         models = response.data.models;
-        colors = response.data.colors;
+        colors.current = response.data.colors;
 
         init();
 
@@ -118,7 +119,7 @@ function ModelViewer() {
         .then(geometries => {
             geometries.forEach(geometry => geometry.computeVertexNormals());
             mergeGeo = BufferGeometryUtils.mergeBufferGeometries(geometries);
-            let mat = new THREE.MeshStandardMaterial();
+            let mat = new THREE.MeshPhongMaterial();
             mat.color.setHex( color );
 
             let mesh = new THREE.Mesh(mergeGeo, mat);
@@ -142,7 +143,7 @@ function ModelViewer() {
         })
         .then(() => {
            
-           animate();
+           //animate();
         })
         .catch(err => {console.error(err);});
 }
@@ -205,9 +206,12 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
             geometry.computeVertexNormals()
             if (geometry) {
                 var mat = new THREE.MeshPhongMaterial();
-                
+                mat.shininess = 50;
+                mat.reflectivity = 1;
                 mat.color.setHex( color );
                 const mesh = new THREE.Mesh(geometry, mat)
+                //mesh.receiveShadow = true;
+                //mesh.castShadow = true;
                 scene.current.add(mesh);
                 mesh.userData['grupo'] = 'Grupo ' + group;
                 let groupLetter = 'A';
@@ -221,6 +225,9 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
                     groupLetter = 'D';
                 }
                 mesh.userData['group_letter'] = 'Grupo ' + groupLetter;
+                
+                mesh.scale.set(scale, scale, scale);
+                mesh.position.set(mesh.position.x * scale, mesh.position.y * scale, mesh.position.z * scale)
 
                 setProgress(Math.ceil(100 * (modelIndex / numberOfModels)));
 
@@ -242,26 +249,42 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
         scene.current = new THREE.Scene();
         scene.current.background = new THREE.Color(0xffffff);
 
-        /*
+        
         var skyTexture = new THREE.TextureLoader().load('img/pexels-freestocksorg-412462.jpg');
         var sky = new THREE.MeshPhongMaterial({map: skyTexture, side: THREE.BackSide});
-        let skyGeo = new THREE.SphereGeometry(950000, 100, 100);
+        let skyGeo = new THREE.SphereGeometry(500, 100, 100);
         let skyBox = new THREE.Mesh(skyGeo, sky);
         skyBox.position.set(0, 0, 0);
         scene.current.add(skyBox);
-        */
+        
 
-        var planeGeo = new THREE.PlaneGeometry( 500000, 500000 );
-        var planeMAt = new THREE.MeshBasicMaterial( {color: 0xf0f0f0, side: THREE.DoubleSide} );
+        var planeGeo = new THREE.PlaneGeometry( 1000000  * scale, 1000000  * scale );
+        var planeMAt = new THREE.MeshBasicMaterial( {color: 0x808080, side: THREE.BackSide} );
         var plane = new THREE.Mesh( planeGeo, planeMAt );
+        //plane.receiveShadow = true;
         plane.rotation.x = Math.PI / 2;
-        //scene.current.add( plane );
+        scene.current.add( plane );
 
         let light = new THREE.AmbientLight({color: 0xffffff, intensity: 1});
         scene.current.add(light);
+        //let light = new THREE.HemisphereLight(0xffffff, 0x808080, 2);
+        //scene.current.add(light);
+        light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(100, 100, 100);
+        //light.castShadow = true;
+        scene.current.add(light);
+        //light = new THREE.SpotLight(0xffffff);
+        //light.castShadow = true;
+        //light.position.set(90, 90, 90);
+        //light.intensity = 2;
+        //scene.current.add(light);
+        
 
-        camera = new THREE.PerspectiveCamera(60, mountRef.current.clientWidth/mountRef.current.clientHeight, 0.1, 300000);
+        camera = new THREE.PerspectiveCamera(60, mountRef.current.clientWidth/mountRef.current.clientHeight, 0.1, 1000000 * scale);
         renderer = new THREE.WebGLRenderer({antialias: true});
+        renderer.setClearColor(new THREE.Color(0xEEEEEE, 1));
+        //renderer.shadowMap.enabled = true;
+        //renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
         mountRef.current.appendChild( renderer.domElement );
 
@@ -293,7 +316,7 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
         let j = 1;
         for (var x in models) {
             var color = "0x"+Math.floor(Math.random()*16777215).toString(16);
-            color = colors[x];
+            color = colors.current[x];
 
             //loadGeometries(models[x], color, i, numberOfModels, j);
 
@@ -304,8 +327,8 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
             }
             i++;
         }
-        camera.position.z = 200000;
-        camera.position.y = 150000;
+        camera.position.z = 200000 * scale;
+        camera.position.y = 150000 * scale;
 
         window.addEventListener( 'resize', onWindowResize, false );
 
@@ -503,13 +526,15 @@ function loadGeometry(path, color, group, numberOfModels, modelIndex) {
                     <Form.Label>
                         <h5>Visualizar Estruturas</h5>
                     </Form.Label>
-                    {grupo.map((x, i) => 
+                    {grupo.map((x, i) =>
                         <Form.Check type="checkbox" 
                                     label={x.name} 
                                     id={x.name}
                                     disabled={isLoading ? true : false}
                                     checked={viewModel[i]}
-                                    onClick={(e) => {toggleGeometry(e);}}/>
+                                    onClick={(e) => {toggleGeometry(e);}}
+                                    style={{ backgroundColor: colors.current[i].replace("0x", "#") }}
+                                    />
                     )}
                 </Form.Group>
             </div>

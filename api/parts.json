@@ -21,5 +21,5 @@
     ["./ply/ppsection20/part_b/g0.ply", "./ply/ppsection20/part_d/g6.ply", "./ply/ppsection20/part_d/g5.ply", "./ply/ppsection20/part_d/g4.ply", "./ply/ppsection20/part_d/g0.ply", "./ply/ppsection20/part_d/g1.ply", "./ply/ppsection20/part_d/g3.ply", "./ply/ppsection20/part_d/g2.ply", "./ply/ppsection20/part_c/g5.ply", "./ply/ppsection20/part_c/g4.ply", "./ply/ppsection20/part_c/g0.ply", "./ply/ppsection20/part_c/g1.ply", "./ply/ppsection20/part_c/g3.ply", "./ply/ppsection20/part_c/g2.ply", "./ply/ppsection20/part_a/g0.ply"],
     ["./ply/ppsection21/part_a/g5.ply", "./ply/ppsection21/part_a/g4.ply", "./ply/ppsection21/part_a/g0.ply", "./ply/ppsection21/part_a/g1.ply", "./ply/ppsection21/part_a/g3.ply", "./ply/ppsection21/part_a/g2.ply"]
     ],
-    "colors": ["0xFF13D1", "0x00FF00", "0xFFA5A5", "0x385067", "0x00FFFF", "0xFF00FF", "0x55626D", "0xFFF4A5" ,"0xD6D6D6", "0x0FFF00", "0xC2FF13", "0xFF0000", "0x0000FF", "0x13F1FF", "0xFF8C00", "0x80482C", "0x8C8C8C", "0xFFF000", "0x861D9B", "0x1C055E", "0x000000"]
+    "colors": ["0xFF13D1", "0x00FF00", "0xFFA5A5", "0x385067", "0x00FFFF", "0xFF00FF", "0x55626D", "0xFFF4A5" ,"0x8C8C8C", "0x0FFF00", "0xC2FF13", "0xFF0000", "0x0000FF", "0x13F1FF", "0xFF8C00", "0x80482C", "0x8C8C8C", "0xFFF000", "0x861D9B", "0x1C055E", "0x00FFCC"]
     }
